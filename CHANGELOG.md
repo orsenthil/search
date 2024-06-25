@@ -1,7 +1,8 @@
-## [project-title] Changelog
+## Changelog
 
+```
 <a name="x.y.z"></a>
-# x.y.z (yyyy-mm-dd)
+# 0.0.1 (yyyy-mm-dd)
 
 *Features*
 * ...
@@ -11,3 +12,4 @@
 
 *Breaking Changes*
 * ...
+```
