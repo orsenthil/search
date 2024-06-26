@@ -1,0 +1,6 @@
+feedparser
+pandas
+aiohttp
+beautifulsoup4
+fastapi
+uvicorn
