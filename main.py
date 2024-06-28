@@ -14,6 +14,10 @@ script_dir = pathlib.Path(__file__).resolve().parent
 templates_path = script_dir / "templates"
 static_path = script_dir / "static"
 
+print(script_dir)
+print(templates_path)
+print(static_path)
+
 app = FastAPI()
 engine = SearchEngine()
 
@@ -30,6 +34,7 @@ def get_top_urls(scores_dict: dict, n: int):
 
 @app.get("/", response_class=HTMLResponse)
 async def search(request: Request):
+    print(templates.env.list_templates())
     posts = engine.posts
     return templates.TemplateResponse("search.html", {"request": request, "posts": posts})
 
@@ -37,7 +42,9 @@ async def search(request: Request):
 @app.get("/results/{query}", response_class=HTMLResponse)
 async def search_results(request: Request, query: str = Path(...)):
     results = engine.search(query)
+    print(results)
     results = get_top_urls(results, n=5)
+    print(results)
     return templates.TemplateResponse("results.html", {"request": request, "results": results, "query": query})
 
 
