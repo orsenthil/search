@@ -42,4 +42,8 @@ INFO:     127.0.0.1:51041 - "GET /results/gpt HTTP/1.1" 200 OK
 ```
 
 
-# screen shots
+# Screenshots
+
+![](screenshots/search-page.png)
+
+![](screenshots/results.png)
