@@ -1,4 +1,5 @@
 import argparse
+import pathlib
 
 import pandas as pd
 from fastapi import FastAPI, Path, Request
@@ -9,11 +10,15 @@ from uvicorn import run
 
 from search import SearchEngine
 
+script_dir = pathlib.Path(__file__).resolve().parent
+templates_path = script_dir / "templates"
+static_path = script_dir / "static"
+
 app = FastAPI()
 engine = SearchEngine()
 
-templates = Jinja2Templates(directory="templates")
-app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory=str(templates_path))
+app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 
 def get_top_urls(scores_dict: dict, n: int):
