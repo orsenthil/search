@@ -36,7 +36,9 @@ class SearchEngine:
 
     @property
     def avdl(self) -> float:
-        return sum(len(d) for d in self._documents.values()) / len(self._documents)
+        if not hasattr(self, "_avdl"):
+            self._avdl = sum(len(d) for d in self._documents.values()) / len(self._documents)
+        return self._avdl
 
     def idf(self, kw: str) -> float:
         N = self.number_of_documents
@@ -66,6 +68,8 @@ class SearchEngine:
         words = normalize_string(content).split(" ")
         for word in words:
             self._index[word][url] += 1
+        if hasattr(self, "_avdl"):
+            del self._avdl
 
     def bulk_index(self, documents: list[tuple[str, str]]):
         for url, content in documents:
@@ -74,3 +78,6 @@ class SearchEngine:
     def get_urls(self, keyword: str) -> dict[str, int]:
         keyword = normalize_string(keyword)
         return self._index[keyword]
+
+
+engine = SearchEngine()

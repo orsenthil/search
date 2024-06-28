@@ -1,0 +1,5 @@
+http://bair.berkeley.edu/blog/feed.xml
+http://benanne.github.io/feed.xml
+https://simonwillison.net/atom/entries/
+https://blog.bytebytego.com/feed
+https://eli.thegreenplace.net/feeds/all.atom.xml
