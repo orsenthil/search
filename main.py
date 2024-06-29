@@ -48,7 +48,7 @@ def read_about(request: Request):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data-path")
+    parser.add_argument("--data-path", required=True, type=str, help="Path to the parquet data file")
     return parser.parse_args()
 
 
