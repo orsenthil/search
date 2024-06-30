@@ -57,7 +57,7 @@ def main():
     data = pd.read_parquet(args.data_path)
     content = list(zip(data["URL"].values, data["content"].values))
     engine.bulk_index(content)
-    run(app, host="127.0.0.1", port=80)
+    run(app, host="0.0.0.0", port=80)
 
 
 if __name__ == "__main__":
