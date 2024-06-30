@@ -1,8 +1,11 @@
 import argparse
 import unittest
-from unittest.mock import patch
+from unittest import IsolatedAsyncioTestCase
+from unittest.mock import MagicMock, patch
 
-from main import get_top_urls, parse_args
+from fastapi import Request
+
+from main import get_top_urls, parse_args, search
 
 
 def test_get_top_urls():
@@ -23,3 +26,29 @@ class TestParseArgs(unittest.TestCase):
         args = parse_args()
         # Assert that the data_path argument is correctly parsed
         self.assertEqual(args.data_path, "test/path")
+
+
+class TestSearchFunction(IsolatedAsyncioTestCase):
+    @patch("main.engine")
+    @patch("main.templates")
+    async def test_search(self, mock_templates, mock_engine):
+        # Setup mock for engine.posts
+        mock_engine.posts = ["post1", "post2"]
+
+        # Setup mock for templates.TemplateResponse
+        mock_response = MagicMock()
+        mock_templates.TemplateResponse.return_value = mock_response
+
+        # Create a mock request object
+        mock_request = MagicMock(spec=Request)
+
+        # Call the search function
+        response = await search(mock_request)
+
+        # Assert TemplateResponse was called with the correct template and context
+        mock_templates.TemplateResponse.assert_called_once_with(
+            "search.html", {"request": mock_request, "posts": ["post1", "post2"]}
+        )
+
+        # Assert the response is correct
+        self.assertEqual(response, mock_response)
