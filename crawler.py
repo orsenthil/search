@@ -20,6 +20,17 @@ def parse_feed(feed_url):
         return []
 
 
+def clean_content(html_content):
+    soup = BeautifulSoup(html_content, "html.parser")
+    for script in soup(["script", "style"]):
+        script.extract()
+    text = soup.get_text()
+    lines = (line.strip() for line in text.splitlines())
+    chunks = (phrase.strip() for line in lines for phrase in line.split(" "))
+    cleaned_text = " ".join(chunk for chunk in chunks if chunk)
+    return cleaned_text
+
+
 async def fetch_content(session, url):
     async with session.get(url) as response:
         return await response.text()
@@ -35,17 +46,6 @@ async def process_feed(feed_url, session, loop):
     except Exception as e:
         print(f"Error processing feed {feed_url}: {e}")
         return []
-
-
-def clean_content(html_content):
-    soup = BeautifulSoup(html_content, "html.parser")
-    for script in soup(["script", "style"]):
-        script.extract()
-    text = soup.get_text()
-    lines = (line.strip() for line in text.splitlines())
-    chunks = (phrase.strip() for line in lines for phrase in line.split(" "))
-    cleaned_text = " ".join(chunk for chunk in chunks if chunk)
-    return cleaned_text
 
 
 def parse_args():

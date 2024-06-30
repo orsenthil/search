@@ -1,7 +1,8 @@
+import argparse
 import unittest
 from unittest.mock import MagicMock, patch
 
-from crawler import clean_content, parse_feed
+from crawler import clean_content, parse_args, parse_feed
 
 
 class TestParseFeed(unittest.TestCase):
@@ -54,5 +55,14 @@ class TestCleanContent(unittest.TestCase):
         self.assertEqual(result, expected_output)
 
 
-if __name__ == "__main__":
-    unittest.main()
+class TestParseArgs(unittest.TestCase):
+    @patch("crawler.argparse.ArgumentParser.parse_args")
+    def test_parse_args_feed_path(self, mock_parse_args):
+        # Mock the return value of parse_args to simulate command line input
+        mock_parse_args.return_value = argparse.Namespace(feed_path="test_feed.xml")
+
+        # Call the function under test
+        args = parse_args()
+
+        # Assert that the feed-path argument is correctly parsed
+        self.assertEqual(args.feed_path, "test_feed.xml")
