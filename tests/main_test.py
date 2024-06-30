@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 from fastapi import Request
 
-from main import get_top_urls, parse_args, search
+from main import get_top_urls, parse_args, search, search_results
 
 
 def test_get_top_urls():
@@ -51,4 +51,39 @@ class TestSearchFunction(IsolatedAsyncioTestCase):
         )
 
         # Assert the response is correct
+        self.assertEqual(response, mock_response)
+
+    @patch("main.engine")
+    @patch("main.templates")
+    async def test_search_results(self, mock_templates, mock_engine):
+        # Setup mock for engine.search
+        mock_engine.search.return_value = {
+            "url1": 10,
+            "url2": 9,
+            "url3": 8,
+            "url4": 7,
+            "url5": 6,
+            "url6": 5,
+            "url7": 4,
+            "url8": 3,
+            "url9": 2,
+            "url10": 1,
+        }
+
+        mock_response = MagicMock()
+        mock_templates.TemplateResponse.return_value = mock_response
+
+        mock_request = MagicMock(spec=Request)
+
+        response = await search_results(mock_request, "test_query")
+
+        mock_templates.TemplateResponse.assert_called_once_with(
+            "results.html",
+            {
+                "request": mock_request,
+                "results": {"url1": 10, "url2": 9, "url3": 8, "url4": 7, "url5": 6},
+                "query": "test_query",
+            },
+        )
+
         self.assertEqual(response, mock_response)
