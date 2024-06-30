@@ -3,6 +3,7 @@
 A tiny search engine in python following the guide
 [https://www.alexmolas.com/2024/02/05/a-search-engine-in-80-lines.html](https://www.alexmolas.com/2024/02/05/a-search-engine-in-80-lines.html)
 
+![Test Status](https://github.com/orsenthil/search/actions/workflows/python.yaml/badge.svg)
 
 # Provide an index of links to crawl.
 
