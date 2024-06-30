@@ -1,11 +1,12 @@
 import argparse
+import asyncio
 import unittest
 from unittest import IsolatedAsyncioTestCase
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import aiohttp
 
-from crawler import clean_content, fetch_content, parse_args, parse_feed
+from crawler import clean_content, fetch_content, parse_args, parse_feed, process_feed
 
 
 class TestParseFeed(unittest.TestCase):
@@ -90,3 +91,28 @@ class TestFetchContent(IsolatedAsyncioTestCase):
             # Assert that the content returned is as expected
             mock_get.assert_called_once_with(url)
             self.assertEqual(content, mocked_response_text)
+
+    async def asyncSetUp(self):
+        self.loop = asyncio.get_event_loop()
+
+    @patch("crawler.parse_feed")
+    @patch("crawler.fetch_content")
+    @patch("crawler.clean_content")
+    async def test_process_feed(self, mock_clean_content, mock_fetch_content, mock_parse_feed):
+        # Setup mock return values
+        mock_parse_feed.return_value = ["http://example.com/post1", "http://example.com/post2"]
+        mock_fetch_content.side_effect = lambda session, url: f"Content for {url}"
+        mock_clean_content.side_effect = lambda content: f"Cleaned {content}"
+
+        # Expected result after processing
+        expected = [
+            ("http://example.com/post1", "Cleaned Content for http://example.com/post1"),
+            ("http://example.com/post2", "Cleaned Content for http://example.com/post2"),
+        ]
+
+        # Run the process_feed function
+        session = MagicMock()  # Mock session object
+        result = await process_feed("http://example.com/feed", session, self.loop)
+
+        # Assert the result matches expected output
+        self.assertEqual(result, expected)
