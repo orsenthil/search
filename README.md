@@ -5,7 +5,7 @@ A tiny search engine in python following the guide
 
 ![Test Status](https://github.com/orsenthil/search/actions/workflows/python.yaml/badge.svg)
 
-![CoverageStatus](https://github.com/orsenthil/search/actions/workflows/coverage.yaml/badge.svg)
+[![codecov](https://codecov.io/github/orsenthil/search/graph/badge.svg?token=YDN1DWEJEU)](https://codecov.io/github/orsenthil/search)
 
 
 # Provide an index of links to crawl.
