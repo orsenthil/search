@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 
 from fastapi import Request
 
-from main import get_top_urls, parse_args, search, search_results
+from main import app, get_top_urls, main, parse_args, read_about, search, search_results
 
 
 def test_get_top_urls():
@@ -87,3 +87,43 @@ class TestSearchFunction(IsolatedAsyncioTestCase):
         )
 
         self.assertEqual(response, mock_response)
+
+    @patch("main.templates")
+    def test_about(self, mock_templates):
+        mock_response = MagicMock()
+        mock_templates.TemplateResponse.return_value = mock_response
+
+        mock_request = MagicMock(spec=Request)
+
+        response = read_about(mock_request)
+
+        mock_templates.TemplateResponse.assert_called_once_with("about.html", {"request": mock_request})
+
+        self.assertEqual(response, mock_response)
+
+    @patch("main.parse_args")
+    @patch("main.pd.read_parquet")
+    @patch("main.engine.bulk_index")
+    @patch("main.run")
+    def test_main_snippet(self, mock_run, mock_bulk_index, mock_read_parquet, mock_parse_args):
+        mock_parse_args.return_value = MagicMock(data_path="test/path")
+
+        mock_data_frame = MagicMock()
+        mock_data_frame.__getitem__.side_effect = lambda x: MagicMock(
+            values=["Example Content"] if x == "content" else ["http://example.com"]
+        )
+
+        mock_read_parquet.return_value = mock_data_frame
+
+        # Execute the code under test
+        main()
+
+        # Assert that read_parquet was called with the correct path
+        mock_read_parquet.assert_called_once_with("test/path")
+
+        # Assert that bulk_index was called with the correct content
+        content = list(zip(["http://example.com"], ["Example Content"]))
+        mock_bulk_index.assert_called_once_with(content)
+
+        # Assert that run was called with the correct arguments
+        mock_run.assert_called_once_with(app, host="127.0.0.1", port=8000)

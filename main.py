@@ -52,9 +52,13 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
+def main():
     args = parse_args()
     data = pd.read_parquet(args.data_path)
     content = list(zip(data["URL"].values, data["content"].values))
     engine.bulk_index(content)
     run(app, host="127.0.0.1", port=8000)
+
+
+if __name__ == "__main__":
+    main()  # pragma: no cover
