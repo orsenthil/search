@@ -15,3 +15,9 @@ login:
 	docker login
 
 all: login build tag push
+
+install-minikube:
+	brew install minikube
+
+start-minikube:
+	minikube start
