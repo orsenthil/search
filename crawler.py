@@ -68,5 +68,5 @@ async def main(feed_file):
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    asyncio.run(main(args.feed_path))
+    args = parse_args()  # pragma: no cover
+    asyncio.run(main(args.feed_path))  # pragma: no cover

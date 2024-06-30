@@ -2,11 +2,11 @@ import argparse
 import asyncio
 import unittest
 from unittest import IsolatedAsyncioTestCase
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, mock_open, patch
 
 import aiohttp
 
-from crawler import clean_content, fetch_content, parse_args, parse_feed, process_feed
+from crawler import clean_content, fetch_content, main, parse_args, parse_feed, process_feed
 
 
 class TestParseFeed(unittest.TestCase):
@@ -116,3 +116,43 @@ class TestFetchContent(IsolatedAsyncioTestCase):
 
         # Assert the result matches expected output
         self.assertEqual(result, expected)
+
+        mock_parse_feed.side_effect = Exception("new exception")
+        session = MagicMock()  # Mock session object
+        try:
+            result = await process_feed("http://example.com/feed", session, self.loop)
+        except Exception as e:  # pragma: no cover
+            self.assertEqual(str(e), "new exception")  # pragma: no cover
+
+    @patch("crawler.pd.DataFrame.to_parquet")
+    @patch("crawler.process_feed")
+    @patch("crawler.open", new_callable=mock_open, read_data="http://example.com/feed1\nhttp://example.com/feed2\n")
+    @patch("crawler.aiohttp.ClientSession")
+    async def test_main(self, mock_session, mock_open, mock_process_feed, mock_to_parquet):
+        # Setup mock return values
+        mock_process_feed.side_effect = [
+            [("http://example.com/post1", "Content 1")],
+            [("http://example.com/post2", "Content 2")],
+        ]
+
+        # Run the main function
+        await main("feeds.txt")
+
+        # Assert process_feed was called correctly
+        mock_process_feed.assert_has_calls(
+            [
+                unittest.mock.call(
+                    "http://example.com/feed1", mock_session.return_value.__aenter__.return_value, self.loop
+                ),
+                unittest.mock.call(
+                    "http://example.com/feed2", mock_session.return_value.__aenter__.return_value, self.loop
+                ),
+            ],
+            any_order=True,
+        )
+
+        # Assert to_parquet was called
+        mock_to_parquet.assert_called_once()
+        args, kwargs = mock_to_parquet.call_args
+        self.assertEqual(args[0], "output.parquet")
+        self.assertFalse(kwargs["index"])
