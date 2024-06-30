@@ -1,8 +1,11 @@
 import argparse
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest import IsolatedAsyncioTestCase
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from crawler import clean_content, parse_args, parse_feed
+import aiohttp
+
+from crawler import clean_content, fetch_content, parse_args, parse_feed
 
 
 class TestParseFeed(unittest.TestCase):
@@ -66,3 +69,24 @@ class TestParseArgs(unittest.TestCase):
 
         # Assert that the feed-path argument is correctly parsed
         self.assertEqual(args.feed_path, "test_feed.xml")
+
+
+class TestFetchContent(IsolatedAsyncioTestCase):
+    @patch("crawler.aiohttp.ClientSession.get")
+    async def test_fetch_content(self, mock_get):
+        # Mock the response of session.get to return an object with an async text() method
+        mock_response = AsyncMock()
+        mocked_response_text = "Mocked content"
+        mock_response.text = AsyncMock(return_value=mocked_response_text)
+        mock_get.return_value.__aenter__.return_value = mock_response
+
+        # Create a mock session and URL for testing
+        async with aiohttp.ClientSession() as session:
+            url = "http://example.com"
+
+            # Call the function under test
+            content = await fetch_content(session, url)
+
+            # Assert that the content returned is as expected
+            mock_get.assert_called_once_with(url)
+            self.assertEqual(content, mocked_response_text)
