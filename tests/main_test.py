@@ -126,4 +126,4 @@ class TestSearchFunction(IsolatedAsyncioTestCase):
         mock_bulk_index.assert_called_once_with(content)
 
         # Assert that run was called with the correct arguments
-        mock_run.assert_called_once_with(app, host="127.0.0.1", port=8000)
+        mock_run.assert_called_once_with(app, host="127.0.0.1", port=80)
