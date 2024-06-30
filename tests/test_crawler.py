@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from crawler import parse_feed
+from crawler import clean_content, parse_feed
 
 
 class TestParseFeed(unittest.TestCase):
@@ -26,3 +26,33 @@ class TestParseFeed(unittest.TestCase):
 
         # Assert the function handles exceptions as expected
         self.assertRaises(Exception, result)
+
+
+class TestCleanContent(unittest.TestCase):
+    def test_clean_content(self):
+        # Mock HTML content with script, style tags, and some text
+        html_content = """
+        <html>
+            <head>
+                <title>Test HTML</title>
+                <style>body {background-color: powderblue;}</style>
+            </head>
+            <body>
+                <script>alert("Hello, world!");</script>
+                <p>This is a <b>test</b> paragraph.</p>
+                <p>This is another test paragraph with <a href="#">a link</a>.</p>
+            </body>
+        </html>
+        """
+        # Expected output after cleaning the HTML content
+        expected_output = "Test HTML This is a test paragraph. This is another test paragraph with a link."
+
+        # Call the clean_content function with the mock HTML content
+        result = clean_content(html_content)
+
+        # Assert that the result matches the expected output
+        self.assertEqual(result, expected_output)
+
+
+if __name__ == "__main__":
+    unittest.main()
