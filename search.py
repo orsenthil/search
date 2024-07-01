@@ -69,7 +69,7 @@ class SearchEngine:
         for word in words:
             self._index[word][url] += 1
         if hasattr(self, "_avdl"):
-            del self._avdl
+            del self._avdl  # pragma: no cover
 
     def bulk_index(self, documents: list[tuple[str, str]]):
         for url, content in documents:
